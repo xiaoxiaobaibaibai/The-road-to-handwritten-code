@@ -2,16 +2,19 @@
 // 1.数组浅拷贝 --slice
 let originArr = [1, 2, { x: 3 }]
 let originObj = {
-    x: 1,
-    y:
-    {
-        z: {
-            a: "hello"
-        }
+    a:1,
+    b:[1,2,3],
+    c:{
+        "0":0
     },
-    z: originArr
-
+    d: undefined,
+    e: null,
+    f: new Date()
 }
+
+// 循环调用
+originObj.originObj = originObj
+
 function shallowCopy1(originArr) {
     console.log(originArr.slice())
     return originArr.slice()
@@ -97,4 +100,31 @@ console.log(deepCopy2(originObj))
 
 originObj.y.z.a = "hello world"
 
+// 3. 对于循环引用的优化
 
+
+
+// function deepCopy3(origin, map = new Map()) {
+    // 在node环境中可以运行，在浏览器对还是会报错（爆栈）。 Map只做到了让他没有报错，但是也并没有完美的解决循环引用的问题
+    // 而 WeakMap 的键值是弱引用的。 什么是弱引用，即垃圾回收机制不考虑 WeakMap 对该对象的引用，也就是说，如果其他对象都不再引用该对象，那么垃圾回收机制会自动回收该对象所占用的内存，不考虑该对象还存在于 WeakMap 之中
+function deepCopy3(origin, map = new WeakMap()) {
+    if (typeof origin === 'object') {
+       let result = Array.isArray(origin) ? [] : {};
+       if(map.get(origin)){
+          return origin;
+       }
+       map.set(origin,result);
+       for(let keys in origin){
+           if (origin.hasOwnProperty(keys)) {
+               result[keys] = deepCopy3(origin[keys],map);
+       }
+           }
+          
+       return map.get(origin);
+    }else{
+      return origin;
+    }
+  };
+
+  
+  
