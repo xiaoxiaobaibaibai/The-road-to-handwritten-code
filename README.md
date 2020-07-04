@@ -143,3 +143,81 @@ function deepCopy3(origin, map = new WeakMap()) {
 
 
 ```
+
+**Function.prototype.bind()**
+> bind() 方法创建一个新的函数，在 bind() 被调用时，这个新函数的 this 被指定为 bind() 的第一个参数，而其余参数将作为新函数的参数，供调用时使用。
+
+#### 语法 **function.bind(thisArg[, arg1[, arg2[, ...]]])** 
+- thisArg调用绑定函数时作为this参数传递给目标函数的值。
+- - 如果使用new运算符构造绑定函数，则忽略该值。
+- - 当使用 bind在setTimeout中创建一个函数（作为回调提供）时，作为 thisArg传递的任何原始值都将转换为 object。
+- - 如果 bind函数的参数列表为空，或者thisArg是null或undefined，执行作用域的 this将被视为新函数的 thisArg。
+- arg1, arg2, ...
+当目标函数被调用时，被预置入绑定函数的参数列表中的参数。
+- 返回值是一个原函数的拷贝，并拥有指定的 this 值和初始参数。
+
+#### bind函数的实现
+首先要了解this的绑定，this的绑定有4种原则：
+- 默认绑定
+- 隐式绑定
+- 显式绑定
+- new 绑定
+
+四种绑定规则的优先级从上到下，依次递增，默认绑定优先级最低，new绑定最高。
+
+其中显式绑定就是，运用apply(...)和call(...)方法，在调用函数时，绑定this，也即是可以指定调用函数中的 this 值
+
+```javascript
+// bind() 方法创建一个新的函数，在 bind() 被调用时，这个新函数的 this 被指定为 bind() 的第一个参数，而其余参数将作为新函数的参数，供调用时使用。
+
+
+  Function.prototype.myBind = function (context) {
+    if(typeof this !== 'function'){
+        throw new TypeError('error')
+    }
+    let _this = this
+    let args = [...arguments].slice[1]
+    const F =  function() {  
+        if (this instanceof F) {
+            // instanceof 运算符用于检测构造函数的 prototype 属性是否出现在某个实例对象的原型链上。
+            return _this.apply(this, args.concat(...arguments))
+        }else {
+            return _this.apply(context, args.concat(...arguments))
+        }
+        
+    }
+    F.prototype = this.prototype
+    return F
+  }
+//  F.prototype = this.prototype，直接修改 F.prototype 的时候，也会直接修改绑定函数的 prototype。可以通过一个空函数来进行中转：
+
+  Function.prototype.myBind2 = function (context) {
+    if(typeof this !== 'function'){
+        throw new TypeError('error')
+    }
+    let _this = this
+    let args = [...arguments].slice[1]
+    let F2 = function() {}
+    let F =  function() {  
+        if (this instanceof F2) {
+            // instanceof 运算符用于检测构造函数的 prototype 属性是否出现在某个实例对象的原型链上。
+            return _this.apply(this, args.concat(...arguments))
+        }else {
+            return _this.apply(context, args.concat(...arguments))
+        }
+        
+    }
+    F2.prototype = this.prototype
+    F.prototype = new F2()
+    return F
+  }
+
+```
+
+
+
+
+
+
+
+
