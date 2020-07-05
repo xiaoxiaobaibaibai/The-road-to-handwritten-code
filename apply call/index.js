@@ -1,3 +1,16 @@
+let a = {
+    b: 2
+}
+
+function bar(name, age) {
+    console.log(this.b);
+    return {
+        b: this.b,
+        name: name,
+        age: age
+    }
+}
+
 Function.prototype.myApply = function(context) {
     if (typeof this !== 'function') {
         throw new TypeError('not a function')
@@ -16,3 +29,20 @@ Function.prototype.myApply = function(context) {
     delete context.fn
     return result
 }
+
+console.log(bar.myApply(a, ['bai', 8])) 
+
+
+ Function.prototype.myCall = function (context, ...args) {
+    if( typeof this !== 'function') {
+             throw new TypeError('not a function')
+     }
+    let fn = Symbol('temp')
+    context = context || window
+    context.fn = this
+     let result = context.fn(...args)
+     delete context.fn
+     return result
+   }
+
+   console.log(bar.myCall(a, 'bai', 8)) 
