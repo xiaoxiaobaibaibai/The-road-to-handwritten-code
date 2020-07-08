@@ -144,7 +144,7 @@ function deepCopy3(origin, map = new WeakMap()) {
 
 ```
 
-**Function.prototype.bind()**
+## **Function.prototype.bind()**
 > bind() 方法创建一个新的函数，在 bind() 被调用时，这个新函数的 this 被指定为 bind() 的第一个参数，而其余参数将作为新函数的参数，供调用时使用。
 
 #### 语法 **function.bind(thisArg[, arg1[, arg2[, ...]]])** 
@@ -213,7 +213,99 @@ function deepCopy3(origin, map = new WeakMap()) {
   }
 
 ```
+## apply call
+> apply() 方法调用一个具有给定this值的函数，以及作为一个数组（或类似数组对象）提供的参数。
 
+> 注意：call()方法的作用和 apply() 方法类似，区别就是call()方法接受的是参数列表，而apply()方法接受的是一个参数数组。
+
+```javascript
+let a = {
+    b: 2
+}
+
+function bar(name, age) {
+    console.log(this.b);
+    return {
+        b: this.b,
+        name: name,
+        age: age
+    }
+}
+
+Function.prototype.myApply = function(context) {
+    if (typeof this !== 'function') {
+        throw new TypeError('not a function')
+    }
+
+    context = context || window
+    // 因为this参数可以传null，当为null时指向window
+    context.fn = this
+    let result // 函数可以有返回值
+    if (arguments[1]) {
+        result = context.fn(...arguments[1])
+    } else {
+        result = context.fn()
+    }
+
+    delete context.fn
+    return result
+}
+
+console.log(bar.myApply(a, ['bai', 8])) 
+
+
+ Function.prototype.myCall = function (context, ...args) {
+    if( typeof this !== 'function') {
+             throw new TypeError('not a function')
+     }
+    let fn = Symbol('temp')
+    context = context || window
+    context.fn = this
+     let result = context.fn(...args)
+     delete context.fn
+     return result
+   }
+
+   console.log(bar.myCall(a, 'bai', 8)) 
+```
+## new
+new操作符做了以下事情：
+- 它创建了一个全新的对象。
+- 它会被执行[[Prototype]]（也就是__proto__）链接。
+- 它使this指向新创建的对象。。
+- 通过new创建的每个对象将最终被[[Prototype]]链接到这个函数的prototype对象上。
+- 如果函数没有返回对象类型Object(包含Functoin, Array, Date, RegExg, Error)，那么new表达式中的函数调用将返回该对象引用。
+
+```javascript
+function myNew() {
+    // 创建一个空对象
+    let emptyObj = {}
+    // 取传入的第一个参数，即构造函数，并删除第一个参数。
+    let constructor =  Array.prototype.shift.call(arguments);
+    
+    // 类型判断，错误处理
+    if(typeof constructor !== "function") {
+        throw("构造函数第一个参数应为函数");
+    }
+    
+    // 绑定 constructor 属性
+    emptyObj.constructor = constructor;
+    
+    // 关联 __proto__ 到 constructor.prototype
+    emptyObj.__proto__ = constructor.prototype;
+    
+    // 将构造函数的 this 指向返回的对象
+    let resultObj = constructor.apply(emptyObj, arguments);
+    
+    // 返回类型判断, 如果是对象，则返回构造函数返回的对象
+    if ((typeof resultObj === "object" || typeof resultObj === "function") && resultObj !== null) {
+    return resultObj
+    }
+    
+    // 返回对象
+    return emptyObj;
+}
+```
 
 
 
