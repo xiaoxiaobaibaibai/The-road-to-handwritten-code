@@ -30,7 +30,7 @@ Function.prototype.myApply = function(context) {
     return result
 }
 
-console.log(bar.myApply(a, ['bai', 8])) 
+// console.log(bar.myApply(a, ['bai', 8])) 
 
 
  Function.prototype.myCall = function (context, ...args) {
@@ -45,4 +45,4 @@ console.log(bar.myApply(a, ['bai', 8]))
      return result
    }
 
-   console.log(bar.myCall(a, 'bai', 8)) 
+    // console.log(bar.myCall(a, 'bai', 8)) 
