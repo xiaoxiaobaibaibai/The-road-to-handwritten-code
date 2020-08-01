@@ -95,3 +95,20 @@ const resolvePromise = (promise, result, resolve, reject) => {
 }
 
 module.exports = Promise
+
+Promise.all = function(promises) {
+    return new Promise(function(resolve, reject) {
+        let result = [];
+        let count = 0;
+        for (let i = 0;i < promises.length; i++) {
+            promises[i].then(function(data) {
+                result[i] = data;
+                if (++count == promises.length) {
+                    resolve(result);
+                }
+            }, function (error) {
+                reject(error);
+              });
+        }
+    })
+}
